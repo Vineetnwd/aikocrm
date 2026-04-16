@@ -1,3 +1,25 @@
+<?php
+use Core\Database;
+use Core\Auth;
+
+$db = Database::getInstance();
+$company_id = Auth::companyId();
+
+// If not logged in, we might want to redirect, but for MVP demo we'll assume a company_id
+if (!$company_id) {
+    // Fallback for demo if no session exists
+    $company_id = 1; 
+}
+
+// Fetch Stats
+$totalLeads = $db->fetchOne("SELECT COUNT(*) as count FROM leads WHERE company_id = ?", [$company_id])['count'];
+$wonDeals = $db->fetchOne("SELECT COUNT(*) as count FROM leads WHERE company_id = ? AND status = 'won'", [$company_id])['count'];
+$pendingInvoices = $db->fetchOne("SELECT SUM(due_amount) as total FROM invoices WHERE company_id = ? AND payment_status != 'paid'", [$company_id])['total'] ?? 0;
+$activeTasks = $db->fetchOne("SELECT COUNT(*) as count FROM tasks WHERE company_id = ? AND status = 'pending'", [$company_id])['count'];
+
+// Fetch Recent Leads
+$recentLeads = $db->fetchAll("SELECT * FROM leads WHERE company_id = ? ORDER BY created_at DESC LIMIT 5", [$company_id]);
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -16,9 +38,9 @@
             <header class="header">
                 <h1 class="page-title">Dashboard Overview</h1>
                 <div class="header-actions">
-                    <button class="btn btn-primary">
+                    <a href="leads" class="btn btn-primary">
                         <i class="fas fa-plus"></i> New Lead
-                    </button>
+                    </a>
                 </div>
             </header>
 
@@ -26,19 +48,19 @@
             <div class="stats-grid">
                 <div class="card stat-card">
                     <span class="stat-label">Total Leads</span>
-                    <span class="stat-value">124</span>
+                    <span class="stat-value"><?= $totalLeads ?></span>
                 </div>
                 <div class="card stat-card">
                     <span class="stat-label">Won Deals</span>
-                    <span class="stat-value">32</span>
+                    <span class="stat-value text-success"><?= $wonDeals ?></span>
                 </div>
                 <div class="card stat-card">
                     <span class="stat-label">Pending Invoices</span>
-                    <span class="stat-value">₹45,200</span>
+                    <span class="stat-value">₹<?= number_format($pendingInvoices, 2) ?></span>
                 </div>
                 <div class="card stat-card">
                     <span class="stat-label">Active Tasks</span>
-                    <span class="stat-value">12</span>
+                    <span class="stat-value"><?= $activeTasks ?></span>
                 </div>
             </div>
 
@@ -58,18 +80,24 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 1rem 0;">John Doe</td>
-                            <td style="padding: 1rem 0;"><span style="background: #fee2e2; color: #ef4444; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">HOT</span></td>
-                            <td style="padding: 1rem 0;">New</td>
-                            <td style="padding: 1rem 0;">Facebook Ads</td>
-                        </tr>
-                        <tr style="border-bottom: 1px solid var(--border);">
-                            <td style="padding: 1rem 0;">Jane Smith</td>
-                            <td style="padding: 1rem 0;"><span style="background: #fef3c7; color: #f59e0b; padding: 0.25rem 0.5rem; border-radius: 1rem; font-size: 0.75rem; font-weight: 600;">WARM</span></td>
-                            <td style="padding: 1rem 0;">In Progress</td>
-                            <td style="padding: 1rem 0;">Referral</td>
-                        </tr>
+                        <?php if (empty($recentLeads)): ?>
+                            <tr>
+                                <td colspan="4" style="padding: 2rem; text-align: center; color: var(--text-muted);">No leads found.</td>
+                            </tr>
+                        <?php else: ?>
+                            <?php foreach ($recentLeads as $lead): ?>
+                            <tr style="border-bottom: 1px solid var(--border);">
+                                <td style="padding: 1rem 0;"><?= htmlspecialchars($lead['name']) ?></td>
+                                <td style="padding: 1rem 0;">
+                                    <span class="badge badge-<?= $lead['category'] ?>">
+                                        <?= strtoupper($lead['category']) ?>
+                                    </span>
+                                </td>
+                                <td style="padding: 1rem 0;"><?= ucfirst(str_replace('_', ' ', $lead['status'])) ?></td>
+                                <td style="padding: 1rem 0;"><?= htmlspecialchars($lead['source']) ?></td>
+                            </tr>
+                            <?php endforeach; ?>
+                        <?php endif; ?>
                     </tbody>
                 </table>
             </div>
