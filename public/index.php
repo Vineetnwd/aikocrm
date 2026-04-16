@@ -15,9 +15,17 @@ spl_autoload_register(function ($class) {
 use Core\Auth;
 use Core\Database;
 
-// Basic Routing (To be expanded)
-$path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
-$path = str_replace('/aikocrm/public', '', $path);
+// Dynamic Routing
+$request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+$script_name = $_SERVER['SCRIPT_NAME'];
+$base_dir = dirname($script_name);
+
+// Remove base_dir from request_uri to get the clean path
+$path = str_replace($base_dir, '', $request_uri);
+$path = trim($path, '/');
+
+// Remove 'index.php' if it's explicitly in the path
+$path = str_replace('index.php', '', $path);
 $path = trim($path, '/');
 
 // Mocking Auth check for now
@@ -31,6 +39,18 @@ switch ($path) {
         break;
     case 'leads':
         include __DIR__ . '/../public/assets/views/leads.php';
+        break;
+    case 'invoices':
+        include __DIR__ . '/../public/assets/views/invoices.php';
+        break;
+    case 'tasks':
+        include __DIR__ . '/../public/assets/views/tasks.php';
+        break;
+    case 'reports':
+        include __DIR__ . '/../public/assets/views/reports.php';
+        break;
+    case 'settings':
+        include __DIR__ . '/../public/assets/views/settings.php';
         break;
     default:
         http_response_code(404);

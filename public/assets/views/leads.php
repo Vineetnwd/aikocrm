@@ -50,20 +50,7 @@
 </head>
 <body>
     <div class="app-container">
-        <!-- Sidebar same as dashboard -->
-        <aside class="sidebar">
-            <a href="dashboard" class="sidebar-logo">
-                <i class="fas fa-rocket"></i> Aikaa CRM
-            </a>
-            <nav class="nav-menu">
-                <div class="nav-item"><a href="dashboard" class="nav-link"><i class="fas fa-home"></i> Dashboard</a></div>
-                <div class="nav-item"><a href="leads" class="nav-link active"><i class="fas fa-user-friends"></i> Leads</a></div>
-                <div class="nav-item"><a href="invoices" class="nav-link"><i class="fas fa-file-invoice-dollar"></i> Invoices</a></div>
-                <div class="nav-item"><a href="tasks" class="nav-link"><i class="fas fa-tasks"></i> Tasks</a></div>
-                <div class="nav-item"><a href="reports" class="nav-link"><i class="fas fa-chart-pie"></i> Reports</a></div>
-                <div class="nav-item"><a href="settings" class="nav-link"><i class="fas fa-cog"></i> Settings</a></div>
-            </nav>
-        </aside>
+        <?php include 'partials/sidebar.php'; ?>
 
         <!-- Main Content -->
         <main class="main-content">
@@ -235,7 +222,5 @@
         // Initial Load
         fetchLeads();
     </script>
-</body>
-</html>
 </body>
 </html>
