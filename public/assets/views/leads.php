@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Leads | Aikaa CRM</title>
-    <link rel="stylesheet" href="assets/css/style.css">
+    <link rel="stylesheet" href="<?= APP_URL ?>/public/assets/css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         .pipeline-container {
@@ -155,7 +155,7 @@
 
         async function fetchLeads() {
             try {
-                const response = await fetch('api/leads.php');
+                const response = await fetch('<?= APP_URL ?>/public/index.php/api/leads.php');
                 const leads = await response.json();
                 renderLeads(leads);
             } catch (error) {
@@ -201,7 +201,7 @@
             const data = Object.fromEntries(formData.entries());
 
             try {
-                const response = await fetch('api/leads.php', {
+                const response = await fetch('<?= APP_URL ?>/public/index.php/api/leads.php', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
