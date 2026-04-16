@@ -9,19 +9,19 @@
     <style>
         .pipeline-container {
             display: flex;
-            gap: 1.5rem;
+            gap: 1rem;
             overflow-x: auto;
-            padding-bottom: 1rem;
-            height: calc(100vh - 180px); /* Fixed height */
+            padding-bottom: 0.5rem;
+            height: calc(100vh - 140px);
             align-items: flex-start;
         }
         .pipeline-column {
             flex: 1;
-            min-width: 320px;
-            max-width: 350px;
+            min-width: 280px;
+            max-width: 300px;
             background: #f1f5f9;
-            border-radius: 1rem;
-            padding: 1.25rem;
+            border-radius: 0.75rem;
+            padding: 0.75rem;
             display: flex;
             flex-direction: column;
             max-height: 100%;
@@ -29,76 +29,68 @@
         .pipeline-header {
             font-weight: 700;
             color: #475569;
-            margin-bottom: 1.25rem;
+            margin-bottom: 0.75rem;
             display: flex;
             justify-content: space-between;
             align-items: center;
             text-transform: uppercase;
             letter-spacing: 0.05em;
-            font-size: 0.875rem;
+            font-size: 0.75rem;
             flex-shrink: 0;
+            padding: 0 0.25rem;
         }
         .leads-list {
             overflow-y: auto;
             flex-grow: 1;
-            padding-right: 0.5rem;
+            padding-right: 0.25rem;
         }
-        /* Custom Scrollbar */
-        .leads-list::-webkit-scrollbar { width: 5px; }
-        .leads-list::-webkit-scrollbar-track { background: transparent; }
+        .leads-list::-webkit-scrollbar { width: 4px; }
         .leads-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
 
         .lead-card {
             background: white;
-            padding: 1.25rem;
-            border-radius: 0.75rem;
-            margin-bottom: 1rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            padding: 0.875rem;
+            border-radius: 0.5rem;
+            margin-bottom: 0.75rem;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.05);
             border: 1px solid transparent;
             transition: all 0.2s;
             position: relative;
         }
-        .lead-card:hover {
-            border-color: var(--primary);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-        }
-        .lead-name { font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; font-size: 1rem; }
-        .lead-info { font-size: 0.8125rem; color: #64748b; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+        .lead-name { font-weight: 700; color: var(--text-main); margin-bottom: 0.375rem; font-size: 0.9375rem; }
+        .lead-info { font-size: 0.75rem; color: #64748b; margin-bottom: 0.25rem; display: flex; align-items: center; gap: 0.4rem; }
         .lead-requirement { 
-            font-size: 0.8125rem; 
+            font-size: 0.75rem; 
             color: #475569; 
             background: #f8fafc; 
-            padding: 0.5rem; 
-            border-radius: 0.375rem;
-            margin-top: 0.75rem;
-            border-left: 3px solid #e2e8f0;
+            padding: 0.375rem; 
+            border-radius: 0.25rem;
+            margin-top: 0.5rem;
+            border-left: 2px solid #e2e8f0;
         }
         .card-actions {
             position: absolute;
-            top: 1rem;
-            right: 1rem;
+            top: 0.75rem;
+            right: 0.75rem;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.25rem;
             opacity: 0;
             transition: opacity 0.2s;
         }
         .lead-card:hover .card-actions { opacity: 1; }
         .action-btn {
-            width: 28px;
-            height: 28px;
-            border-radius: 6px;
+            width: 24px;
+            height: 24px;
+            border-radius: 4px;
             display: flex;
-            items-center: center;
+            align-items: center;
             justify-content: center;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             cursor: pointer;
             border: 1px solid #e2e8f0;
             background: white;
             color: #64748b;
         }
-        .action-btn:hover { background: #f1f5f9; color: var(--primary); }
-        .action-btn.delete:hover { border-color: #fee2e2; color: #ef4444; }
     </style>
 </head>
 <body>
