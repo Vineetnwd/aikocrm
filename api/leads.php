@@ -46,5 +46,14 @@ if ($method === 'GET') {
     ]);
     
     echo json_encode(['success' => true, 'id' => $id]);
+} elseif ($method === 'DELETE') {
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        $leadModel->delete($id);
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Lead ID is required']);
+    }
 }
 ?>

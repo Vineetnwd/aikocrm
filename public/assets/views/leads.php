@@ -12,40 +12,93 @@
             gap: 1.5rem;
             overflow-x: auto;
             padding-bottom: 1rem;
+            height: calc(100vh - 180px); /* Fixed height */
+            align-items: flex-start;
         }
         .pipeline-column {
             flex: 1;
-            min-width: 300px;
+            min-width: 320px;
+            max-width: 350px;
             background: #f1f5f9;
-            border-radius: 0.75rem;
-            padding: 1rem;
+            border-radius: 1rem;
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            max-height: 100%;
         }
         .pipeline-header {
-            font-weight: 600;
-            color: var(--text-muted);
-            margin-bottom: 1rem;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 1.25rem;
             display: flex;
             justify-content: space-between;
+            align-items: center;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            font-size: 0.875rem;
+            flex-shrink: 0;
         }
+        .leads-list {
+            overflow-y: auto;
+            flex-grow: 1;
+            padding-right: 0.5rem;
+        }
+        /* Custom Scrollbar */
+        .leads-list::-webkit-scrollbar { width: 5px; }
+        .leads-list::-webkit-scrollbar-track { background: transparent; }
+        .leads-list::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+
         .lead-card {
             background: white;
-            padding: 1rem;
-            border-radius: 0.5rem;
-            margin-bottom: 0.75rem;
-            box-shadow: var(--shadow-sm);
-            cursor: move;
+            padding: 1.25rem;
+            border-radius: 0.75rem;
+            margin-bottom: 1rem;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            border: 1px solid transparent;
+            transition: all 0.2s;
+            position: relative;
         }
-        .lead-name { font-weight: 600; margin-bottom: 0.25rem; }
-        .lead-meta { font-size: 0.75rem; color: var(--text-muted); }
-        .badge {
-            font-size: 0.7rem;
-            padding: 0.15rem 0.4rem;
-            border-radius: 1rem;
-            font-weight: 700;
+        .lead-card:hover {
+            border-color: var(--primary);
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
         }
-        .badge-hot { background: #fee2e2; color: #ef4444; }
-        .badge-warm { background: #fef3c7; color: #f59e0b; }
-        .badge-cold { background: #e0f2fe; color: #0ea5e9; }
+        .lead-name { font-weight: 700; color: var(--text-main); margin-bottom: 0.5rem; font-size: 1rem; }
+        .lead-info { font-size: 0.8125rem; color: #64748b; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.5rem; }
+        .lead-requirement { 
+            font-size: 0.8125rem; 
+            color: #475569; 
+            background: #f8fafc; 
+            padding: 0.5rem; 
+            border-radius: 0.375rem;
+            margin-top: 0.75rem;
+            border-left: 3px solid #e2e8f0;
+        }
+        .card-actions {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            display: flex;
+            gap: 0.5rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+        .lead-card:hover .card-actions { opacity: 1; }
+        .action-btn {
+            width: 28px;
+            height: 28px;
+            border-radius: 6px;
+            display: flex;
+            items-center: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            cursor: pointer;
+            border: 1px solid #e2e8f0;
+            background: white;
+            color: #64748b;
+        }
+        .action-btn:hover { background: #f1f5f9; color: var(--primary); }
+        .action-btn.delete:hover { border-color: #fee2e2; color: #ef4444; }
     </style>
 </head>
 <body>
@@ -58,7 +111,7 @@
                 <h1 class="page-title">Lead Management</h1>
                 <div class="header-actions">
                     <button class="btn btn-primary" onclick="toggleModal('leadModal')">
-                        <i class="fas fa-plus"></i> Add Lead
+                        <i class="fas fa-plus"></i> Add New Lead
                     </button>
                 </div>
             </header>
@@ -67,29 +120,29 @@
             <div class="pipeline-container" id="kanbanBoard">
                 <div class="pipeline-column" data-status="new">
                     <div class="pipeline-header">
-                        <span>NEW</span>
+                        <span>New Leads</span>
                         <span class="badge badge-cold counter">0</span>
                     </div>
                     <div class="leads-list"></div>
                 </div>
                 <div class="pipeline-column" data-status="in_progress">
                     <div class="pipeline-header">
-                        <span>IN PROGRESS</span>
-                        <span class="badge badge-cold counter">0</span>
+                        <span>In Progress</span>
+                        <span class="badge badge-warm counter">0</span>
                     </div>
                     <div class="leads-list"></div>
                 </div>
                 <div class="pipeline-column" data-status="won">
                     <div class="pipeline-header">
-                        <span>WON</span>
-                        <span class="badge badge-cold counter">0</span>
+                        <span>Won Deals</span>
+                        <span class="badge badge-hot counter" style="background:var(--success); color:white;">0</span>
                     </div>
                     <div class="leads-list"></div>
                 </div>
                 <div class="pipeline-column" data-status="lost">
                     <div class="pipeline-header">
-                        <span>LOST</span>
-                        <span class="badge badge-cold counter">0</span>
+                        <span>Lost</span>
+                        <span class="badge counter" style="background:#94a3b8; color:white;">0</span>
                     </div>
                     <div class="leads-list"></div>
                 </div>
@@ -98,36 +151,39 @@
     </div>
 
     <!-- Modal for Adding Lead -->
-    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
-        <div class="card" style="width: 500px;">
-            <h2 style="margin-bottom: 1.5rem;">Add New Lead</h2>
+    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index:100; align-items:center; justify-content:center;">
+        <div class="card" style="width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+                <h2 style="font-size: 1.5rem; font-weight: 800;">Add New Lead</h2>
+                <i class="fas fa-times" onclick="toggleModal('leadModal')" style="cursor:pointer; color:#94a3b8;"></i>
+            </div>
             <form id="leadForm">
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Lead Name</label>
-                        <input type="text" name="name" required style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Lead Name</label>
+                        <input type="text" name="name" required class="form-input" style="padding: 0.625rem;">
                     </div>
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Mobile</label>
-                        <input type="text" name="mobile" required style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Mobile</label>
+                        <input type="text" name="mobile" required class="form-input" style="padding: 0.625rem;">
                     </div>
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Email (Optional)</label>
-                    <input type="email" name="email" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Email Address</label>
+                    <input type="email" name="email" class="form-input" style="padding: 0.625rem;">
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Category</label>
-                        <select name="category" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Category</label>
+                        <select name="category" class="form-input" style="padding: 0.625rem;">
                             <option value="warm">Warm</option>
                             <option value="hot">Hot</option>
                             <option value="cold">Cold</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Source</label>
-                        <select name="source" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Source</label>
+                        <select name="source" class="form-input" style="padding: 0.625rem;">
                             <option value="facebook">Facebook</option>
                             <option value="website">Website</option>
                             <option value="referral">Referral</option>
@@ -136,12 +192,12 @@
                     </div>
                 </div>
                 <div style="margin-bottom: 1.5rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Requirement</label>
-                    <textarea name="requirement" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem; height: 80px;"></textarea>
+                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Lead Requirements</label>
+                    <textarea name="requirement" class="form-input" style="height: 100px; padding: 0.75rem; border-radius: 0.75rem;"></textarea>
                 </div>
-                <div style="display:flex; justify-content: flex-end; gap: 0.5rem;">
-                    <button type="button" class="btn" onclick="toggleModal('leadModal')" style="background:#f1f5f9;">Cancel</button>
-                    <button type="submit" class="btn btn-primary">Save Lead</button>
+                <div style="display:flex; justify-content: flex-end; gap: 0.75rem;">
+                    <button type="button" class="btn" onclick="toggleModal('leadModal')" style="background:#f8fafc; color:#64748b; border: 1px solid #e2e8f0;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Save Lead</button>
                 </div>
             </form>
         </div>
@@ -163,8 +219,20 @@
             }
         }
 
+        async function deleteLead(id) {
+            if (!confirm('Are you sure you want to delete this lead?')) return;
+            try {
+                const response = await fetch(`<?= APP_URL ?>/public/index.php/api/leads.php?id=${id}`, {
+                    method: 'DELETE'
+                });
+                const result = await response.json();
+                if (result.success) fetchLeads();
+            } catch (error) {
+                console.error('Error deleting lead:', error);
+            }
+        }
+
         function renderLeads(leads) {
-            // Clear existing
             document.querySelectorAll('.leads-list').forEach(list => list.innerHTML = '');
             const counters = { new: 0, in_progress: 0, won: 0, lost: 0 };
 
@@ -175,20 +243,25 @@
                     const card = document.createElement('div');
                     card.className = 'lead-card';
                     card.innerHTML = `
+                        <div class="card-actions">
+                            <div class="action-btn" title="Edit"><i class="fas fa-edit"></i></div>
+                            <div class="action-btn delete" title="Delete" onclick="deleteLead(${lead.id})"><i class="fas fa-trash"></i></div>
+                        </div>
                         <div class="lead-name">${lead.name}</div>
-                        <div class="lead-meta">
-                            Source: ${lead.source} • 
-                            <span class="badge badge-${lead.category}">${lead.category.toUpperCase()}</span>
+                        <div class="lead-info">
+                            <i class="fas fa-phone" style="width:14px"></i> ${lead.mobile}
                         </div>
-                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.5rem;">
-                            <i class="fas fa-phone"></i> ${lead.mobile}
+                        ${lead.email ? `<div class="lead-info"><i class="fas fa-envelope" style="width:14px"></i> ${lead.email}</div>` : ''}
+                        <div style="margin-top:0.75rem; display:flex; justify-content: space-between; align-items: center;">
+                            <span class="badge badge-${lead.category.toLowerCase()}">${lead.category.toUpperCase()}</span>
+                            <span style="font-size:0.7rem; color:#94a3b8;"><i class="fas fa-bullseye"></i> ${lead.source}</span>
                         </div>
+                        ${lead.requirement ? `<div class="lead-requirement">${lead.requirement.substring(0, 100)}${lead.requirement.length > 100 ? '...' : ''}</div>` : ''}
                     `;
                     column.appendChild(card);
                 }
             });
 
-            // Update counters
             Object.keys(counters).forEach(status => {
                 const badge = document.querySelector(`.pipeline-column[data-status="${status}"] .counter`);
                 if (badge) badge.textContent = counters[status];
@@ -219,7 +292,6 @@
             }
         });
 
-        // Initial Load
         fetchLeads();
     </script>
 </body>
