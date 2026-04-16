@@ -196,9 +196,40 @@
     </div>
 
     <script>
+        let currentEditId = null;
+
         function toggleModal(id) {
             const el = document.getElementById(id);
-            el.style.display = el.style.display === 'none' ? 'flex' : 'none';
+            if (el.style.display === 'flex') {
+                el.style.display = 'none';
+                document.getElementById('leadForm').reset();
+                currentEditId = null;
+                document.querySelector('#leadModal h2').textContent = 'Add New Lead';
+            } else {
+                el.style.display = 'flex';
+            }
+        }
+
+        async function openEditModal(id) {
+            try {
+                const response = await fetch(`<?= APP_URL ?>/public/index.php/api/leads.php?id=${id}`);
+                const lead = await response.json();
+                
+                currentEditId = id;
+                document.querySelector('#leadModal h2').textContent = 'Edit Lead';
+                
+                const form = document.getElementById('leadForm');
+                form.elements['name'].value = lead.name;
+                form.elements['mobile'].value = lead.mobile;
+                form.elements['email'].value = lead.email || '';
+                form.elements['category'].value = lead.category;
+                form.elements['source'].value = lead.source;
+                form.elements['requirement'].value = lead.requirement || '';
+                
+                toggleModal('leadModal');
+            } catch (error) {
+                console.error('Error fetching lead details:', error);
+            }
         }
 
         async function fetchLeads() {
@@ -236,7 +267,7 @@
                     card.className = 'lead-card';
                     card.innerHTML = `
                         <div class="card-actions">
-                            <div class="action-btn" title="Edit"><i class="fas fa-edit"></i></div>
+                            <div class="action-btn" title="Edit" onclick="openEditModal(${lead.id})"><i class="fas fa-edit"></i></div>
                             <div class="action-btn delete" title="Delete" onclick="deleteLead(${lead.id})"><i class="fas fa-trash"></i></div>
                         </div>
                         <div class="lead-name">${lead.name}</div>
@@ -264,17 +295,21 @@
             e.preventDefault();
             const formData = new FormData(this);
             const data = Object.fromEntries(formData.entries());
+            
+            if (currentEditId) {
+                data.id = currentEditId;
+            }
 
             try {
-                const response = await fetch('<?= APP_URL ?>/public/index.php/api/leads.php', {
-                    method: 'POST',
+                const url = '<?= APP_URL ?>/public/index.php/api/leads.php';
+                const response = await fetch(url, {
+                    method: currentEditId ? 'PUT' : 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(data)
                 });
                 const result = await response.json();
                 if (result.success) {
                     toggleModal('leadModal');
-                    this.reset();
                     fetchLeads();
                 } else {
                     alert('Error: ' + result.error);

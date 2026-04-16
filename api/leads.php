@@ -23,8 +23,14 @@ $leadModel = new Lead();
 $method = $_SERVER['REQUEST_METHOD'];
 
 if ($method === 'GET') {
-    $leads = $leadModel->all();
-    echo json_encode($leads);
+    $id = $_GET['id'] ?? null;
+    if ($id) {
+        $lead = $leadModel->find($id);
+        echo json_encode($lead);
+    } else {
+        $leads = $leadModel->all();
+        echo json_encode($leads);
+    }
 } elseif ($method === 'POST') {
     $input = json_decode(file_get_contents('php://input'), true);
     
@@ -46,6 +52,18 @@ if ($method === 'GET') {
     ]);
     
     echo json_encode(['success' => true, 'id' => $id]);
+} elseif ($method === 'PUT') {
+    $input = json_decode(file_get_contents('php://input'), true);
+    $id = $input['id'] ?? null;
+    
+    if ($id) {
+        unset($input['id']);
+        $leadModel->update($id, $input);
+        echo json_encode(['success' => true]);
+    } else {
+        http_response_code(400);
+        echo json_encode(['error' => 'Lead ID is required for update']);
+    }
 } elseif ($method === 'DELETE') {
     $id = $_GET['id'] ?? null;
     if ($id) {
