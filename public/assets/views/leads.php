@@ -77,59 +77,76 @@
             </header>
 
             <!-- Pipeline View -->
-            <div class="pipeline-container">
-                <div class="pipeline-column">
+            <div class="pipeline-container" id="kanbanBoard">
+                <div class="pipeline-column" data-status="new">
                     <div class="pipeline-header">
                         <span>NEW</span>
-                        <span class="badge badge-cold">3</span>
+                        <span class="badge badge-cold counter">0</span>
                     </div>
-                    <div class="lead-card">
-                        <div class="lead-name">Alice Cooper</div>
-                        <div class="lead-meta">Source: Facebook • <span class="badge badge-hot">HOT</span></div>
-                    </div>
-                    <div class="lead-card">
-                        <div class="lead-name">Bob Marley</div>
-                        <div class="lead-meta">Source: Website • <span class="badge badge-warm">WARM</span></div>
-                    </div>
+                    <div class="leads-list"></div>
                 </div>
-                <div class="pipeline-column">
+                <div class="pipeline-column" data-status="in_progress">
                     <div class="pipeline-header">
                         <span>IN PROGRESS</span>
-                        <span class="badge badge-cold">2</span>
+                        <span class="badge badge-cold counter">0</span>
                     </div>
-                    <div class="lead-card">
-                        <div class="lead-name">Charlie Brown</div>
-                        <div class="lead-meta">Source: Referral • <span class="badge badge-warm">WARM</span></div>
-                    </div>
+                    <div class="leads-list"></div>
                 </div>
-                <div class="pipeline-column">
+                <div class="pipeline-column" data-status="won">
                     <div class="pipeline-header">
                         <span>WON</span>
-                        <span class="badge badge-cold">5</span>
+                        <span class="badge badge-cold counter">0</span>
                     </div>
+                    <div class="leads-list"></div>
                 </div>
-                <div class="pipeline-column">
+                <div class="pipeline-column" data-status="lost">
                     <div class="pipeline-header">
                         <span>LOST</span>
-                        <span class="badge badge-cold">1</span>
+                        <span class="badge badge-cold counter">0</span>
                     </div>
+                    <div class="leads-list"></div>
                 </div>
             </div>
         </main>
     </div>
 
-    <!-- Modal Mockup -->
-    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; display:flex; align-items:center; justify-content:center;">
-        <div class="card" style="width: 450px;">
+    <!-- Modal for Adding Lead -->
+    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:100; align-items:center; justify-content:center;">
+        <div class="card" style="width: 500px;">
             <h2 style="margin-bottom: 1.5rem;">Add New Lead</h2>
             <form id="leadForm">
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Lead Name</label>
-                    <input type="text" name="name" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Lead Name</label>
+                        <input type="text" name="name" required style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Mobile</label>
+                        <input type="text" name="mobile" required style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                    </div>
                 </div>
                 <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Mobile</label>
-                    <input type="text" name="mobile" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Email (Optional)</label>
+                    <input type="email" name="email" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                    <div>
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Category</label>
+                        <select name="category" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                            <option value="warm">Warm</option>
+                            <option value="hot">Hot</option>
+                            <option value="cold">Cold</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Source</label>
+                        <select name="source" style="width:100%; padding:0.625rem; border:1px solid var(--border); border-radius:0.5rem;">
+                            <option value="facebook">Facebook</option>
+                            <option value="website">Website</option>
+                            <option value="referral">Referral</option>
+                            <option value="ads">Ads</option>
+                        </select>
+                    </div>
                 </div>
                 <div style="margin-bottom: 1.5rem;">
                     <label style="display:block; margin-bottom: 0.5rem; font-size: 0.875rem;">Requirement</label>
@@ -149,15 +166,76 @@
             el.style.display = el.style.display === 'none' ? 'flex' : 'none';
         }
 
-        document.getElementById('leadForm').addEventListener('submit', function(e) {
+        async function fetchLeads() {
+            try {
+                const response = await fetch('api/leads.php');
+                const leads = await response.json();
+                renderLeads(leads);
+            } catch (error) {
+                console.error('Error fetching leads:', error);
+            }
+        }
+
+        function renderLeads(leads) {
+            // Clear existing
+            document.querySelectorAll('.leads-list').forEach(list => list.innerHTML = '');
+            const counters = { new: 0, in_progress: 0, won: 0, lost: 0 };
+
+            leads.forEach(lead => {
+                const column = document.querySelector(`.pipeline-column[data-status="${lead.status}"] .leads-list`);
+                if (column) {
+                    counters[lead.status]++;
+                    const card = document.createElement('div');
+                    card.className = 'lead-card';
+                    card.innerHTML = `
+                        <div class="lead-name">${lead.name}</div>
+                        <div class="lead-meta">
+                            Source: ${lead.source} • 
+                            <span class="badge badge-${lead.category}">${lead.category.toUpperCase()}</span>
+                        </div>
+                        <div style="font-size: 0.7rem; color: #94a3b8; margin-top: 0.5rem;">
+                            <i class="fas fa-phone"></i> ${lead.mobile}
+                        </div>
+                    `;
+                    column.appendChild(card);
+                }
+            });
+
+            // Update counters
+            Object.keys(counters).forEach(status => {
+                const badge = document.querySelector(`.pipeline-column[data-status="${status}"] .counter`);
+                if (badge) badge.textContent = counters[status];
+            });
+        }
+
+        document.getElementById('leadForm').addEventListener('submit', async function(e) {
             e.preventDefault();
-            // API call would go here
-            alert('Lead saved successfully (Mock)');
-            toggleModal('leadModal');
+            const formData = new FormData(this);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                const response = await fetch('api/leads.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                if (result.success) {
+                    toggleModal('leadModal');
+                    this.reset();
+                    fetchLeads();
+                } else {
+                    alert('Error: ' + result.error);
+                }
+            } catch (error) {
+                console.error('Error saving lead:', error);
+            }
         });
 
-        // Hide modal initially (fixing CSS display:flex override)
-        document.getElementById('leadModal').style.display = 'none';
+        // Initial Load
+        fetchLeads();
     </script>
+</body>
+</html>
 </body>
 </html>

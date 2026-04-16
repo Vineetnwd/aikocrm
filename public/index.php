@@ -24,9 +24,17 @@ $path = trim($path, '/');
 Auth::check();
 
 // Simple response for testing
-if ($path === '' || $path === 'dashboard') {
-    include __DIR__ . '/../public/assets/views/dashboard.php';
-} else {
-    echo "404 - Page not found: " . $path;
+switch ($path) {
+    case '':
+    case 'dashboard':
+        include __DIR__ . '/../public/assets/views/dashboard.php';
+        break;
+    case 'leads':
+        include __DIR__ . '/../public/assets/views/leads.php';
+        break;
+    default:
+        http_response_code(404);
+        echo "404 - Page not found: " . $path;
+        break;
 }
 ?>
