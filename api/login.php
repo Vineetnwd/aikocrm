@@ -22,9 +22,18 @@ if (empty($email) || empty($password)) {
     exit;
 }
 
+// Detailed debug login
+$db = Database::getInstance();
+$user = $db->fetchOne("SELECT * FROM users WHERE email = ?", [$email]);
+
+if (!$user) {
+    echo json_encode(['error' => "Debug: Account '$email' not found in database."]);
+    exit;
+}
+
 if (Auth::login($email, $password)) {
     echo json_encode(['success' => true]);
 } else {
-    echo json_encode(['error' => 'Invalid email or password']);
+    echo json_encode(['error' => 'Debug: Password verification failed.']);
 }
 ?>

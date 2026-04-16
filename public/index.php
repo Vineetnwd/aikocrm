@@ -61,6 +61,18 @@ if (strpos($path, 'api/') === 0) {
 
 switch ($path) {
     case 'login':
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+            $email = $_POST['email'] ?? '';
+            $password = $_POST['password'] ?? '';
+            if (Auth::login($email, $password)) {
+                header('Location: ' . APP_URL . '/public/index.php/dashboard');
+                exit;
+            } else {
+                $loginError = "Invalid email or password.";
+                include __DIR__ . '/../public/assets/views/login.php';
+                exit;
+            }
+        }
         if (Auth::check()) {
             header('Location: ' . APP_URL . '/public/index.php/dashboard');
             exit;

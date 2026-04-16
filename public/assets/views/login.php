@@ -94,12 +94,14 @@
         <h2 style="text-align:center; margin-bottom: 0.5rem; font-size: 1.5rem;">Welcome back</h2>
         <p style="text-align:center; color: #64748b; margin-bottom: 2rem; font-size: 0.875rem;">Enter your credentials to access your account</p>
         
-        <div id="errorBox" class="error-msg"></div>
+        <div id="errorBox" class="error-msg" <?= isset($loginError) ? 'style="display:block"' : '' ?>>
+            <?= $loginError ?? '' ?>
+        </div>
 
-        <form id="loginForm">
+        <form id="loginForm" method="POST" action="">
             <div class="form-group">
                 <label class="form-label">Email Address</label>
-                <input type="email" name="email" class="form-input" placeholder="admin@aikocrm.com" required>
+                <input type="email" name="email" class="form-input" placeholder="admin@aikocrm.com" value="<?= htmlspecialchars($_POST['email'] ?? '') ?>" required>
             </div>
             <div class="form-group">
                 <label class="form-label">Password</label>
@@ -114,35 +116,5 @@
             Don't have an account? <a href="#" style="color: #4f46e5; font-weight: 600; text-decoration: none;">Contact Admin</a>
         </p>
     </div>
-
-    <script>
-        document.getElementById('loginForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-            const errorBox = document.getElementById('errorBox');
-            errorBox.style.display = 'none';
-            
-            const formData = new FormData(this);
-            const data = Object.fromEntries(formData.entries());
-
-            try {
-                const response = await fetch('<?= APP_URL ?>/public/index.php/api/login.php', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(data)
-                });
-                const result = await response.json();
-
-                if (result.success) {
-                    window.location.href = '<?= APP_URL ?>/public/index.php/dashboard';
-                } else {
-                    errorBox.textContent = result.error || 'Invalid credentials';
-                    errorBox.style.display = 'block';
-                }
-            } catch (error) {
-                errorBox.textContent = 'Something went wrong. Please try again.';
-                errorBox.style.display = 'block';
-            }
-        });
-    </script>
 </body>
 </html>
