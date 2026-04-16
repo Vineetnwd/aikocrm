@@ -48,17 +48,28 @@ if ($path !== 'login' && strpos($path, 'api/') === false && !Auth::check()) {
 }
 
 // Simple response for testing
+if (strpos($path, 'api/') === 0) {
+    $apiFile = __DIR__ . '/../' . $path;
+    if (file_exists($apiFile)) {
+        include $apiFile;
+    } else {
+        http_response_code(404);
+        echo json_encode(['error' => 'API endpoint not found: ' . $path]);
+    }
+    exit;
+}
+
 switch ($path) {
     case 'login':
         if (Auth::check()) {
-            header('Location: ' . APP_URL . '/dashboard');
+            header('Location: ' . APP_URL . '/public/index.php/dashboard');
             exit;
         }
         include __DIR__ . '/../public/assets/views/login.php';
         break;
     case 'logout':
         Auth::logout();
-        header('Location: ' . APP_URL . '/login');
+        header('Location: ' . APP_URL . '/public/index.php/login');
         break;
     case '':
     case 'dashboard':
