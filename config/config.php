@@ -1,6 +1,7 @@
 <?php
 // Environment Detection
-$is_local = in_array($_SERVER['HTTP_HOST'], ['localhost', '127.0.0.1']);
+$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+$is_local = in_array($host, ['localhost', '127.0.0.1']);
 
 if ($is_local) {
     // Local Settings
@@ -8,7 +9,9 @@ if ($is_local) {
     define('DB_USER', 'root');
     define('DB_PASS', '');
     define('DB_NAME', 'aikaa_crm');
-    define('APP_URL', 'http://localhost/aikocrm');
+    
+    // Dynamic local URL includes port if present
+    define('APP_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/aikocrm');
 } else {
     // Live Settings (aikocrm.com)
     define('DB_HOST', 'localhost');
