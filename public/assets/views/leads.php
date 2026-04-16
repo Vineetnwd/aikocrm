@@ -91,6 +91,34 @@
             background: white;
             color: #64748b;
         }
+        
+        /* Modern Form Styling */
+        .form-input {
+            width: 100%;
+            padding: 0.625rem 0.875rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 0.5rem;
+            background: #ffffff;
+            font-family: inherit;
+            font-size: 0.875rem;
+            color: #1e293b;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+            outline: none;
+        }
+        .form-input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15);
+            background: #fff;
+        }
+        .form-input::placeholder { color: #94a3b8; }
+        label {
+            display: block;
+            margin-bottom: 0.375rem;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #64748b;
+            letter-spacing: 0.01em;
+        }
     </style>
 </head>
 <body>
@@ -142,40 +170,45 @@
         </main>
     </div>
 
-    <!-- Modal for Adding Lead -->
-    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.7); backdrop-filter: blur(4px); z-index:100; align-items:center; justify-content:center;">
-        <div class="card" style="width: 500px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.25);">
-            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
-                <h2 style="font-size: 1.5rem; font-weight: 800;">Add New Lead</h2>
-                <i class="fas fa-times" onclick="toggleModal('leadModal')" style="cursor:pointer; color:#94a3b8;"></i>
+    <!-- Modal for Adding/Editing Lead -->
+    <div id="leadModal" style="display:none; position:fixed; inset:0; background:rgba(15, 23, 42, 0.6); backdrop-filter: blur(8px); z-index:100; align-items:center; justify-content:center;">
+        <div class="card" style="width: 460px; padding: 1.5rem; border-radius: 1rem; border: none; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3);">
+            <div style="display:flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+                <h2 style="font-size: 1.25rem; font-weight: 800; letter-spacing: -0.02em;">Add New Lead</h2>
+                <div onclick="toggleModal('leadModal')" style="cursor:pointer; width: 24px; height: 24px; display:flex; align-items:center; justify-content:center; border-radius: 50%; background: #f1f5f9; color: #64748b;">
+                    <i class="fas fa-times" style="font-size: 0.75rem;"></i>
+                </div>
             </div>
+            
             <form id="leadForm">
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Lead Name</label>
-                        <input type="text" name="name" required class="form-input" style="padding: 0.625rem;">
+                        <label>Full Name</label>
+                        <input type="text" name="name" required class="form-input" placeholder="e.g. John Smith">
                     </div>
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Mobile</label>
-                        <input type="text" name="mobile" required class="form-input" style="padding: 0.625rem;">
+                        <label>Mobile No.</label>
+                        <input type="text" name="mobile" required class="form-input" placeholder="e.g. 9876543210">
                     </div>
                 </div>
-                <div style="margin-bottom: 1rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Email Address</label>
-                    <input type="email" name="email" class="form-input" style="padding: 0.625rem;">
+
+                <div style="margin-bottom: 0.75rem;">
+                    <label>Email Address</label>
+                    <input type="email" name="email" class="form-input" placeholder="e.g. john@example.com">
                 </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1rem;">
+
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Category</label>
-                        <select name="category" class="form-input" style="padding: 0.625rem;">
+                        <label>Priority</label>
+                        <select name="category" class="form-input">
                             <option value="warm">Warm</option>
                             <option value="hot">Hot</option>
                             <option value="cold">Cold</option>
                         </select>
                     </div>
                     <div>
-                        <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Source</label>
-                        <select name="source" class="form-input" style="padding: 0.625rem;">
+                        <label>Source</label>
+                        <select name="source" class="form-input">
                             <option value="facebook">Facebook</option>
                             <option value="website">Website</option>
                             <option value="referral">Referral</option>
@@ -183,13 +216,15 @@
                         </select>
                     </div>
                 </div>
+
                 <div style="margin-bottom: 1.5rem;">
-                    <label style="display:block; margin-bottom: 0.5rem; font-size: 0.8125rem; font-weight: 600; color:#475569;">Lead Requirements</label>
-                    <textarea name="requirement" class="form-input" style="height: 100px; padding: 0.75rem; border-radius: 0.75rem;"></textarea>
+                    <label>Detailed Requirements</label>
+                    <textarea name="requirement" class="form-input" style="height: 80px;" placeholder="What are they looking for?"></textarea>
                 </div>
-                <div style="display:flex; justify-content: flex-end; gap: 0.75rem;">
-                    <button type="button" class="btn" onclick="toggleModal('leadModal')" style="background:#f8fafc; color:#64748b; border: 1px solid #e2e8f0;">Cancel</button>
-                    <button type="submit" class="btn btn-primary" style="padding: 0.75rem 1.5rem;">Save Lead</button>
+
+                <div style="display:flex; justify-content: flex-end; gap: 0.5rem; padding-top: 1rem; border-top: 1px solid #f1f5f9;">
+                    <button type="button" class="btn" onclick="toggleModal('leadModal')" style="background:transparent; color:#64748b; font-size: 0.75rem;">Cancel</button>
+                    <button type="submit" class="btn btn-primary" style="padding: 0.5rem 1.25rem; font-size: 0.8125rem;">Save Lead</button>
                 </div>
             </form>
         </div>
