@@ -40,11 +40,25 @@ for (; $i < count($request_parts); $i++) {
 $path = implode('/', $path_parts);
 $path = trim($path, '/');
 
-// Mocking Auth check for now
-Auth::check();
+// Authentication Middleware
+if ($path !== 'login' && strpos($path, 'api/') === false && !Auth::check()) {
+    header('Location: ' . APP_URL . '/login');
+    exit;
+}
 
 // Simple response for testing
 switch ($path) {
+    case 'login':
+        if (Auth::check()) {
+            header('Location: ' . APP_URL . '/dashboard');
+            exit;
+        }
+        include __DIR__ . '/../public/assets/views/login.php';
+        break;
+    case 'logout':
+        Auth::logout();
+        header('Location: ' . APP_URL . '/login');
+        break;
     case '':
     case 'dashboard':
         include __DIR__ . '/../public/assets/views/dashboard.php';

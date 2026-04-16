@@ -40,4 +40,12 @@ if ($current_path == 'public' || $current_path == 'index.php' || $current_path =
             </a>
         </div>
     </nav>
+    <div class="sidebar-footer" style="padding: 1rem; border-top: 1px solid #1e293b; margin-top: auto;">
+        <div style="font-size: 0.875rem; color: #94a3b8; margin-bottom: 0.5rem;">
+            Logged in as: <strong><?= \Core\Auth::user()['name'] ?? 'Admin' ?></strong>
+        </div>
+        <a href="logout" class="nav-link" style="padding: 0.5rem 0; color: #ef4444;">
+            <i class="fas fa-sign-out-alt"></i> Logout
+        </a>
+    </div>
 </aside>

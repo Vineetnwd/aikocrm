@@ -9,7 +9,7 @@ if ($is_local) {
     define('DB_USER', 'root');
     define('DB_PASS', '');
     define('DB_NAME', 'aikaa_crm');
-    
+
     // Dynamic local URL includes port if present
     define('APP_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/aikocrm');
 } else {
