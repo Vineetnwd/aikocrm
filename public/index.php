@@ -15,17 +15,29 @@ spl_autoload_register(function ($class) {
 use Core\Auth;
 use Core\Database;
 
-// Dynamic Routing
+// Robust Dynamic Routing
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $script_name = $_SERVER['SCRIPT_NAME'];
-$base_dir = dirname($script_name);
 
-// Remove base_dir from request_uri to get the clean path
-$path = str_replace($base_dir, '', $request_uri);
-$path = trim($path, '/');
+$request_parts = explode('/', trim($request_uri, '/'));
+$script_parts = explode('/', trim($script_name, '/'));
 
-// Remove 'index.php' if it's explicitly in the path
-$path = str_replace('index.php', '', $path);
+$path_parts = [];
+$i = 0;
+// Skip identical parts at the beginning (the base directory prefix)
+while ($i < count($request_parts) && $i < count($script_parts) && $request_parts[$i] === $script_parts[$i]) {
+    $i++;
+}
+
+// Any remaining parts in the request URI are the actual path
+for (; $i < count($request_parts); $i++) {
+    // Also skip 'index.php' if it appears in the request URI
+    if ($request_parts[$i] !== 'index.php') {
+        $path_parts[] = $request_parts[$i];
+    }
+}
+
+$path = implode('/', $path_parts);
 $path = trim($path, '/');
 
 // Mocking Auth check for now
