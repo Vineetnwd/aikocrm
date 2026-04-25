@@ -29,6 +29,14 @@ class Auth {
         return self::$currentUser;
     }
 
+    public static function userId() {
+        return self::$currentUser ? self::$currentUser['id'] : null;
+    }
+
+    public static function userName() {
+        return self::$currentUser ? self::$currentUser['name'] : 'Admin User';
+    }
+
     public static function companyId() {
         return self::$currentUser ? self::$currentUser['company_id'] : null;
     }

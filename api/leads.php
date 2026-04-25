@@ -20,58 +20,72 @@ if (!Auth::check()) {
 }
 
 $leadModel = new Lead();
-$method = $_SERVER['REQUEST_METHOD'];
+$method    = $_SERVER['REQUEST_METHOD'];
 
-if ($method === 'GET') {
-    $id = $_GET['id'] ?? null;
-    if ($id) {
-        $lead = $leadModel->find($id);
-        echo json_encode($lead);
-    } else {
-        $leads = $leadModel->all();
-        echo json_encode($leads);
+try {
+    if ($method === 'GET') {
+        $id     = $_GET['id']     ?? null;
+        $action = $_GET['action'] ?? null;
+
+        if ($action === 'check_duplicate') {
+            $mobile      = trim($_GET['mobile']      ?? '');
+            $requirement = trim($_GET['requirement'] ?? '');
+            $excludeId   = intval($_GET['exclude_id'] ?? 0) ?: null;
+            if ($mobile) {
+                $existing = $leadModel->findByMobile($mobile, $excludeId, $requirement);
+                echo json_encode(['duplicate' => (bool)$existing, 'lead' => $existing ?: null]);
+            } else {
+                echo json_encode(['duplicate' => false, 'lead' => null]);
+            }
+            exit;
+        }
+
+        if ($id) {
+            $lead = $leadModel->find(intval($id));
+            echo json_encode($lead);
+        } else {
+            echo json_encode($leadModel->all());
+        }
+
+    } elseif ($method === 'POST') {
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+
+        if (empty($input['name']) || empty($input['mobile'])) {
+            http_response_code(400);
+            echo json_encode(['error' => 'Name and Mobile are required']);
+            exit;
+        }
+        if (!isset($input['status'])) $input['status'] = 'new';
+
+        $id = $leadModel->create($input);
+        echo json_encode(['success' => true, 'id' => $id]);
+
+    } elseif ($method === 'PUT') {
+        $input = json_decode(file_get_contents('php://input'), true) ?? [];
+        $id    = intval($input['id'] ?? 0);
+
+        if ($id) {
+            unset($input['id']);
+            $leadModel->update($id, $input);
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Lead ID is required for update']);
+        }
+
+    } elseif ($method === 'DELETE') {
+        $id = intval($_GET['id'] ?? 0);
+        if ($id) {
+            $leadModel->delete($id);
+            echo json_encode(['success' => true]);
+        } else {
+            http_response_code(400);
+            echo json_encode(['error' => 'Lead ID is required']);
+        }
     }
-} elseif ($method === 'POST') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    
-    // Basic validation
-    if (empty($input['name']) || empty($input['mobile'])) {
-        http_response_code(400);
-        echo json_encode(['error' => 'Name and Mobile are required']);
-        exit;
-    }
-    
-    $id = $leadModel->create([
-        'name' => $input['name'],
-        'mobile' => $input['mobile'],
-        'email' => $input['email'] ?? null,
-        'requirement' => $input['requirement'] ?? null,
-        'category' => $input['category'] ?? 'warm',
-        'source' => $input['source'] ?? 'direct',
-        'status' => 'new'
-    ]);
-    
-    echo json_encode(['success' => true, 'id' => $id]);
-} elseif ($method === 'PUT') {
-    $input = json_decode(file_get_contents('php://input'), true);
-    $id = $input['id'] ?? null;
-    
-    if ($id) {
-        unset($input['id']);
-        $leadModel->update($id, $input);
-        echo json_encode(['success' => true]);
-    } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Lead ID is required for update']);
-    }
-} elseif ($method === 'DELETE') {
-    $id = $_GET['id'] ?? null;
-    if ($id) {
-        $leadModel->delete($id);
-        echo json_encode(['success' => true]);
-    } else {
-        http_response_code(400);
-        echo json_encode(['error' => 'Lead ID is required']);
-    }
+
+} catch (Throwable $e) {
+    http_response_code(500);
+    echo json_encode(['error' => $e->getMessage(), 'file' => basename($e->getFile()), 'line' => $e->getLine()]);
 }
 ?>

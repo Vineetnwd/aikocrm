@@ -1,6 +1,6 @@
 <?php
 // Environment Detection
-$host = explode(':', $_SERVER['HTTP_HOST'])[0];
+$host = explode(':', $_SERVER['HTTP_HOST'] ?? 'localhost')[0];
 $is_local = in_array($host, ['localhost', '127.0.0.1']);
 
 if ($is_local) {
@@ -11,14 +11,20 @@ if ($is_local) {
     define('DB_NAME', 'aikaa_crm');
 
     // Dynamic local URL includes port if present
-    define('APP_URL', 'http://' . $_SERVER['HTTP_HOST'] . '/aikocrm');
+    define('APP_URL', 'http://' . ($_SERVER['HTTP_HOST'] ?? 'localhost') . '/aikocrm');
 } else {
     // Live Settings (aikocrm.com)
     define('DB_HOST', 'localhost');
-    define('DB_USER', 'u138788005_aikocrm'); // Updated to reflect live DB name usually matches user
+    define('DB_USER', 'u138788005_aikocrm');
     define('DB_PASS', 'AikoCrm@2026');
     define('DB_NAME', 'u138788005_aikocrm');
-    define('APP_URL', 'https://aikocrm.com/');
+
+    // Dynamic live URL detection
+    $protocol = (isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on') ? "https" : "http";
+    $script_dir = dirname($_SERVER['SCRIPT_NAME'] ?? '');
+    $base_path = preg_replace('/\/public$/', '', $script_dir);
+    $base_path = rtrim($base_path, '/');
+    define('APP_URL', $protocol . "://" . ($_SERVER['HTTP_HOST'] ?? 'aikocrm.com') . $base_path);
 }
 
 // App Config

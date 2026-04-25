@@ -10,7 +10,8 @@ if ($current_path == 'public' || $current_path == 'index.php' || $current_path =
     </a>
     <nav class="nav-menu">
         <div class="nav-item">
-            <a href="<?= APP_URL ?>/public/index.php/dashboard" class="nav-link <?= $path == 'dashboard' || $path == '' ? 'active' : '' ?>">
+            <a href="<?= APP_URL ?>/public/index.php/dashboard"
+                class="nav-link <?= $path == 'dashboard' || $path == '' ? 'active' : '' ?>">
                 <i class="fas fa-th-large"></i> Dashboard
             </a>
         </div>
@@ -20,7 +21,14 @@ if ($current_path == 'public' || $current_path == 'index.php' || $current_path =
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?= APP_URL ?>/public/index.php/invoices" class="nav-link <?= $path == 'invoices' ? 'active' : '' ?>">
+            <a href="<?= APP_URL ?>/public/index.php/quotations"
+                class="nav-link <?= $path == 'quotations' ? 'active' : '' ?>">
+                <i class="fas fa-file-contract"></i> Quotations
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?= APP_URL ?>/public/index.php/invoices"
+                class="nav-link <?= $path == 'invoices' ? 'active' : '' ?>">
                 <i class="fas fa-file-invoice-dollar"></i> Invoices
             </a>
         </div>
@@ -30,12 +38,32 @@ if ($current_path == 'public' || $current_path == 'index.php' || $current_path =
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?= APP_URL ?>/public/index.php/reports" class="nav-link <?= $path == 'reports' ? 'active' : '' ?>">
+            <a href="<?= APP_URL ?>/public/index.php/employees"
+                class="nav-link <?= $path == 'employees' ? 'active' : '' ?>">
+                <i class="fas fa-id-badge"></i> Employees
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?= APP_URL ?>/public/index.php/performance"
+                class="nav-link <?= $path == 'performance' ? 'active' : '' ?>">
+                <i class="fas fa-chart-bar"></i> Performance
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?= APP_URL ?>/public/index.php/commissions"
+                class="nav-link <?= $path == 'commissions' ? 'active' : '' ?>">
+                <i class="fas fa-hand-holding-usd"></i> Commissions
+            </a>
+        </div>
+        <div class="nav-item">
+            <a href="<?= APP_URL ?>/public/index.php/reports"
+                class="nav-link <?= $path == 'reports' ? 'active' : '' ?>">
                 <i class="fas fa-chart-line"></i> Reports
             </a>
         </div>
         <div class="nav-item">
-            <a href="<?= APP_URL ?>/public/index.php/settings" class="nav-link <?= $path == 'settings' ? 'active' : '' ?>">
+            <a href="<?= APP_URL ?>/public/index.php/settings"
+                class="nav-link <?= $path == 'settings' ? 'active' : '' ?>">
                 <i class="fas fa-cog"></i> Settings
             </a>
         </div>

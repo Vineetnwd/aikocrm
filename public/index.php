@@ -7,10 +7,12 @@ spl_autoload_register(function ($class) {
     $prefix = 'Core\\';
     $base_dir = __DIR__ . '/../core/';
     $len = strlen($prefix);
-    if (strncmp($prefix, $class, $len) !== 0) return;
+    if (strncmp($prefix, $class, $len) !== 0)
+        return;
     $relative_class = substr($class, $len);
     $file = $base_dir . str_replace('\\', '/', $relative_class) . '.php';
-    if (file_exists($file)) require $file;
+    if (file_exists($file))
+        require $file;
 });
 
 use Core\Auth;
@@ -20,8 +22,9 @@ use Core\Database;
 $request_uri = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
 $script_name = $_SERVER['SCRIPT_NAME'];
 
-$request_parts = explode('/', trim($request_uri, '/'));
-$script_parts = explode('/', trim($script_name, '/'));
+// Clean segments by removing empty ones caused by redundant slashes
+$request_parts = array_values(array_filter(explode('/', $request_uri), 'strlen'));
+$script_parts = array_values(array_filter(explode('/', $script_name), 'strlen'));
 
 $path_parts = [];
 $i = 0;
@@ -43,7 +46,7 @@ $path = trim($path, '/');
 
 // Authentication Middleware
 if ($path !== 'login' && strpos($path, 'api/') === false && !Auth::check()) {
-    header('Location: ' . APP_URL . '/login');
+    header('Location: ' . APP_URL . '/public/index.php/login');
     exit;
 }
 
@@ -90,8 +93,38 @@ switch ($path) {
     case 'leads':
         include __DIR__ . '/../public/assets/views/leads.php';
         break;
+    case 'quotations':
+        include __DIR__ . '/../public/assets/views/quotations.php';
+        break;
+    case 'quotation/print':
+        include __DIR__ . '/../public/assets/views/quotation_print.php';
+        break;
     case 'invoices':
         include __DIR__ . '/../public/assets/views/invoices.php';
+        break;
+    case 'invoice_ledger':
+        include __DIR__ . '/../public/assets/views/invoice_ledger.php';
+        break;
+    case 'invoice_receipt':
+        include __DIR__ . '/../public/assets/views/invoice_receipt.php';
+        break;
+    case 'api/invoices.php':
+        include __DIR__ . '/../api/invoices.php';
+        exit;
+    case 'api/tasks.php':
+        include __DIR__ . '/../api/tasks.php';
+        exit;
+    case 'employees':
+        include __DIR__ . '/../public/assets/views/employees.php';
+        break;
+    case 'commissions':
+        include __DIR__ . '/../public/assets/views/commissions.php';
+        break;
+    case 'employee_commissions':
+        include __DIR__ . '/../public/assets/views/employee_commissions.php';
+        break;
+    case 'performance':
+        include __DIR__ . '/../public/assets/views/performance.php';
         break;
     case 'tasks':
         include __DIR__ . '/../public/assets/views/tasks.php';
